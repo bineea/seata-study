@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/globaltransaction/globaltransaction.iml" filepath="$PROJECT_DIR$/globaltransaction/globaltransaction.iml" />
+      <module fileurl="file://$PROJECT_DIR$/seata-study.iml" filepath="$PROJECT_DIR$/seata-study.iml" />
+      <module fileurl="file://$PROJECT_DIR$/seata-tc/seata-tc.iml" filepath="$PROJECT_DIR$/seata-tc/seata-tc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/service-a/service-a.iml" filepath="$PROJECT_DIR$/service-a/service-a.iml" />
+      <module fileurl="file://$PROJECT_DIR$/service-b/service-b.iml" filepath="$PROJECT_DIR$/service-b/service-b.iml" />
+    </modules>
+  </component>
+</project>
