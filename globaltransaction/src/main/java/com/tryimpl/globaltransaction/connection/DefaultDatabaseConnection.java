@@ -18,6 +18,8 @@ public class DefaultDatabaseConnection implements Connection {
         this.defaultTransaction = defaultTransaction;
     }
 
+    /***********************************调整setAutoCommit()、close()、commit()、rollback()方法***************************************************/
+
     @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
         if (connection != null) {

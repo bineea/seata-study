@@ -9,10 +9,12 @@ public class DefaultTransaction {
     private String transactionId;
     private TransactionType transactionType;
     private Task task;
+    private boolean isEnd;
 
-    public DefaultTransaction(String groupId, String transactionId) {
+    public DefaultTransaction(String groupId, String transactionId, boolean isEnd) {
         this.groupId = groupId;
         this.transactionId = transactionId;
+        this.isEnd = isEnd;
         this.task = new Task();
     }
 
@@ -54,5 +56,13 @@ public class DefaultTransaction {
 
     public void setTask(Task task) {
         this.task = task;
+    }
+
+    public boolean isEnd() {
+        return isEnd;
+    }
+
+    public void setEnd(boolean end) {
+        isEnd = end;
     }
 }

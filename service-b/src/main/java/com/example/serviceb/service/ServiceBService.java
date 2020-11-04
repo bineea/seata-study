@@ -12,7 +12,7 @@ public class ServiceBService {
     @Autowired
     private SampleTestBDao sampleTestBDao;
 
-    @GlobalTransactional
+    @GlobalTransactional(isEnd = true)
     @Transactional
     public void doSomething() {
         sampleTestBDao.insert("test to handle B");

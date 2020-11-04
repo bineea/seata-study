@@ -11,6 +11,7 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,7 +26,9 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     private static ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-    private static volatile ConcurrentHashMap<String, List<String>>  transactionRelateMap = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, HashMap<String, String>>  transactionRelateMap = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, Boolean> transactionIsEndMap = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, Integer> transactionCountMap = new ConcurrentHashMap<>();
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
@@ -38,21 +41,33 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         System.out.println("接收操作数据："+msg.toString());
 
         JSONObject jsonObject = JSON.parseObject((String) msg);
-        String command = jsonObject.getString("command"); // create-创建全局事务，register-注册分支事务，commit-提交全局事务，rollback-回滚全局事务
+        String command = jsonObject.getString("command"); // create-创建全局事务，register-注册分支事务
         String groupId = jsonObject.getString("groupId");   // 全局事务id
         String transactionType = jsonObject.getString("transactionType"); // 分支事务类型，commit-待提交，rollback-待回滚
         String transactionId = jsonObject.getString("transactionId");   // 分支事务id
+        Boolean transactionIsEnd = jsonObject.getBoolean("transactionIsEnd"); // 分支事务是否为最后的结束事务
+        Integer transactionCount = jsonObject.getInteger("transactionCount"); // 分支事务的数量
 
         if("create".equals(command)) {
-            transactionRelateMap.put(groupId, new ArrayList<>());
+            transactionRelateMap.put(groupId, new HashMap<>());
+            transactionIsEndMap.put(groupId, false);
         } else if("register".equals(command)) {
-            transactionRelateMap.get(groupId).add(transactionId);
+            transactionRelateMap.get(groupId).put(transactionId, transactionType);
 
-            if("rollback".equals(transactionType)) {
-                responseResult(groupId, "rollback");
+            if(transactionIsEnd) {
+                transactionIsEndMap.put(groupId, true);
+                transactionCountMap.put(groupId, transactionCount);
             }
-        } else if("commit".equals(command)) {
-            responseResult(groupId, "rollback");
+
+            if(transactionIsEndMap.get(groupId) && transactionCountMap.get(groupId).equals(transactionRelateMap.get(groupId).size())) {
+                transactionRelateMap.get(groupId).keySet().forEach(k -> System.out.println(transactionRelateMap.get(groupId).get(k)));
+                if(transactionRelateMap.get(groupId).containsValue("rollback")) {
+                    responseResult(groupId, "rollback");
+                } else {
+                    responseResult(groupId, "commit");
+                }
+            }
+
         }
 
     }

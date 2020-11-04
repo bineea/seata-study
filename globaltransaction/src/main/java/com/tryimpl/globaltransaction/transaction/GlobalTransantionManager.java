@@ -13,10 +13,11 @@ import java.util.UUID;
 @Component
 public class GlobalTransantionManager {
 
-    private static NettyClient nettyClient = new NettyClient();
+    private static NettyClient nettyClient;
 
     private static ThreadLocal<DefaultTransaction> currentTransaction = new ThreadLocal<>();
     private static ThreadLocal<String> currentGroupId = new ThreadLocal<>();
+    private static ThreadLocal<Integer> currentTransactionCount = new ThreadLocal<>();
 
     //通过set方法实现依赖注入
     @Autowired
@@ -48,14 +49,15 @@ public class GlobalTransantionManager {
     /**
      * 创建分支事务
      */
-    public static DefaultTransaction getOrCreateTransaction(String groupId) {
+    public static DefaultTransaction getOrCreateTransaction(String groupId, boolean isEnd) {
         if(currentTransaction.get() != null) {
             return currentTransaction.get();
         } else {
             String transactionId = UUID.randomUUID().toString();
-            DefaultTransaction defaultTransaction = new DefaultTransaction(groupId, transactionId);
+            DefaultTransaction defaultTransaction = new DefaultTransaction(groupId, transactionId, isEnd);
             currentTransaction.set(defaultTransaction);
             DEFAULTTRANSACION_MAP.put(groupId, defaultTransaction);
+            addCurrentTransactionCount();
             return defaultTransaction;
         }
     }
@@ -69,6 +71,8 @@ public class GlobalTransantionManager {
         obj.put("groupId", defaultTransaction.getGroupId());
         obj.put("transactionId", defaultTransaction.getTransactionId());
         obj.put("transactionType", transactionType);
+        obj.put("transactionIsEnd", defaultTransaction.isEnd());
+        obj.put("transactionCount", getCurrentTransactionCount());
         nettyClient.send(obj);
         System.out.println("注册分支事务");
         return defaultTransaction;
@@ -95,5 +99,20 @@ public class GlobalTransantionManager {
 
     public static DefaultTransaction getCurrentDefaultTransaction() {
         return currentTransaction.get();
+    }
+
+    public static Integer getCurrentTransactionCount() {
+        return currentTransactionCount.get() == null ? 0 : currentTransactionCount.get();
+    }
+
+    public static void setCurrentTransactionCount(int i) {
+        currentTransactionCount.set(i);
+    }
+
+    public static Integer addCurrentTransactionCount() {
+        int count = currentTransactionCount.get() == null ? 0 : currentTransactionCount.get() ;
+        count += 1;
+        currentTransactionCount.set(count);
+        return count;
     }
 }

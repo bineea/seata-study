@@ -24,17 +24,17 @@ public class GlobalTransactionalAspectHandler implements Ordered {
     @Around(value = "handleGlobalTransactionalPointcut()")
     public void handleGlobalTransactionalAound(ProceedingJoinPoint point) {
 
-        //MethodSignature signature = (MethodSignature) point.getSignature();
-        //Method method = signature.getMethod();
-        //GlobalTransactional globalTransactional = method.getAnnotation(GlobalTransactional.class);
+        MethodSignature signature = (MethodSignature) point.getSignature();
+        Method method = signature.getMethod();
+        GlobalTransactional globalTransactional = method.getAnnotation(GlobalTransactional.class);
 
         //创建全局事务
         String groupId = GlobalTransantionManager.getOrCreateGroupId();
 
         //创建分支事务
-        DefaultTransaction defaultTransaction = GlobalTransantionManager.getOrCreateTransaction(groupId);
+        DefaultTransaction defaultTransaction = GlobalTransantionManager.getOrCreateTransaction(groupId, globalTransactional.isEnd());
 
-        TransactionType transactionType = null;
+        TransactionType transactionType;
 
         //根据程序是否异常，确定分支事务的类型
         try {

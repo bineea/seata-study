@@ -2,6 +2,7 @@ package com.tryimpl.globaltransaction.interceptor;
 
 import com.tryimpl.globaltransaction.transaction.GlobalTransantionManager;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,10 +16,15 @@ import javax.servlet.http.HttpServletResponse;
 public class RequestInterceptor implements HandlerInterceptor {
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String groupId = request.getHeader("groupId");
-        System.out.println("拦截器groupId:"+groupId);
-        GlobalTransantionManager.setCurrentGroupId(groupId);
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        String groupIdStr = request.getHeader("groupId");
+        String transactionCountStr = request.getHeader("transactionCount");
+        if(StringUtils.hasText(groupIdStr) && StringUtils.hasText(transactionCountStr)) {
+            int transactionCount = Integer.parseInt(transactionCountStr);
+            System.out.println("拦截器groupId:"+groupIdStr+"拦截器transactionCount:"+transactionCount);
+            GlobalTransantionManager.setCurrentGroupId(groupIdStr);
+            GlobalTransantionManager.setCurrentTransactionCount(transactionCount);
+        }
         return true;
     }
 }

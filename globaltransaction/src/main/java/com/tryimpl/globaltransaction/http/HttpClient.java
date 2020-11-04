@@ -20,6 +20,7 @@ public class HttpClient {
             HttpGet httpGet = new HttpGet(url);
             httpGet.addHeader("Content-type", "application/json");
             httpGet.addHeader("groupId", GlobalTransantionManager.getCurrentGroupId());
+            httpGet.addHeader("transactionCount", String.valueOf(GlobalTransantionManager.getCurrentTransactionCount()));
             CloseableHttpResponse response = httpClient.execute(httpGet);
 
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
