@@ -21,3 +21,20 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# 2018-01-14
+# all files in the target directory
+target/
+
+# 2018-01-14
+# all files about eclipse configuration
+.settings/
+.classpath
+.project
+
+# 2019-03-01
+# all files about idea configuration
+.idea
+*.iws
+*.iml
+*.ipr
